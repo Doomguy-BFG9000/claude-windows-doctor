@@ -136,9 +136,11 @@ export function fakeMachine(d = {}) {
       const dirs = [cwd || sys.cwd, ...W.splitList(envGet(e, "PATH", platform))];
       const exts = W.pathExt(envGet(e, "PATHEXT", platform));
       const lines = [];
+      // where.exe matches a name that already has an extension as it is, and a name without one with each extension of PATHEXT
+      const candidates = W.extname(name) ? [name] : exts.map((ext) => `${name}${ext}`);
       for (const dir of dirs) {
-        for (const ext of exts) {
-          const f = W.join(dir, `${name}${ext}`);
+        for (const c of candidates) {
+          const f = W.join(dir, c);
           if (fileMap.has(norm(f))) lines.push(fileMap.get(norm(f)));
         }
       }

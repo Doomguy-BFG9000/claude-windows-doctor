@@ -105,13 +105,19 @@ export function runCli(args, { cwd, env, input, timeout = 120000 } = {}) {
   return { code: r.status, out: r.stdout || "", err: r.stderr || "", all: `${r.stdout || ""}${r.stderr || ""}` };
 }
 
-/** Runs main() in this process, on the machine `sys` (a pretend one from test/machine.mjs, or the real one), and captures what it prints. */
-export async function run(args, { sys, userEnv, now = NOW, env } = {}) {
+/**
+ * Runs main() in this process, on the machine `sys` (a pretend one from test/machine.mjs, or the real one), and captures what it prints.
+ * With a pretend machine the throwaway folders are pretend too (no folder is made on the disk) unless `tempDir` says otherwise.
+ */
+export async function run(args, { sys, userEnv, store, tempDir, liveRunner, now = NOW, env } = {}) {
   let out = "";
   let err = "";
   const code = await main(args, {
     sys,
     userEnv,
+    store,
+    liveRunner,
+    tempDir: tempDir || (sys && sys.runs ? (sys.platform === "win32" ? "C:\\Temp\\cwd-test" : "/tmp/cwd-test") : undefined),
     env,
     now,
     stdout: { write: (s) => { out += s; return true; } },
