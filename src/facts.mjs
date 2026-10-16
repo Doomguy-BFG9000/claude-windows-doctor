@@ -90,8 +90,14 @@ export const BLOCKING = new Set(["Restricted", "AllSigned"]);
 export function executionPolicyFacts(sys, { shell, respect = false } = {}) {
   if (sys.platform !== "win32") return { ok: true, list: [], effective: null };
   const exe = shell || "powershell.exe";
-  const r = sys.run(exe, ["-NoProfile", "-NonInteractive", "-Command", "Get-ExecutionPolicy -List | ForEach-Object { $_.Scope.ToString() + '=' + $_.ExecutionPolicy.ToString() }"], { timeout: 60000 });
-  if (r.error || r.status !== 0) return { ok: false, list: [], effective: null, error: r.error ? `${exe} could not run (${r.error.code || r.error.message})` : `${exe} exited ${r.status}` };
+  // a PowerShell started from another one (this tool run from pwsh 7, as on a CI runner) inherits the other's PSModulePath, and Windows PowerShell 5.1
+  // then loads the modules of PowerShell 7 and fails; with no PSModulePath each PowerShell works out its own
+  const env = Object.fromEntries(Object.entries(sys.env).filter(([k]) => k.toLowerCase() !== "psmodulepath"));
+  const r = sys.run(exe, ["-NoProfile", "-NonInteractive", "-Command", "Get-ExecutionPolicy -List | ForEach-Object { $_.Scope.ToString() + '=' + $_.ExecutionPolicy.ToString() }"], { env, timeout: 60000 });
+  if (r.error || r.status !== 0) {
+    const said = String(r.stderr || r.stdout || "").trim().split(/\r?\n/).find((l) => l.trim());
+    return { ok: false, list: [], effective: null, error: r.error ? `${exe} could not run (${r.error.code || r.error.message})` : `${exe} exited ${r.status}${said ? `: ${said.trim().slice(0, 160)}` : ""}` };
+  }
   const list = parseExecutionPolicy(r.stdout);
   if (!list.length) return { ok: false, list, effective: null, error: "Get-ExecutionPolicy -List printed no policy" };
   return { ok: true, list, respect, effective: effectivePolicy(list, { respect }), machine: effectivePolicy(list, { respect: true }) };

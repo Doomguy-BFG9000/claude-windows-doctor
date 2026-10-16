@@ -6,6 +6,8 @@ import fs from "node:fs";
 import http from "node:http";
 
 const args = process.argv.slice(2);
+// the runner of `node --test` also starts every file of test/ on its own, with no arguments: then this is a helper, not a test, and it sends nothing
+if (!args.includes("-p")) process.exit(0);
 const after = (flag) => { const i = args.indexOf(flag); return i >= 0 ? args[i + 1] : undefined; };
 const env = process.env;
 if (env.FAKE_CLAUDE_DUMP) {

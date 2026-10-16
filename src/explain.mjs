@@ -107,7 +107,7 @@ export const PAGES = [
   {
     id: "claude-not-on-path", title: "claude is installed and its folder is not on PATH",
     means: "The installer put claude somewhere that PATH does not list, so a terminal does not know the command.",
-    does: ["V: claude doctor prints the same: \"Native installation exists but ...\\.local\\bin is not in your PATH\" (2.1.299).", "D: the native installer's folder is %USERPROFILE%\\.local\\bin; npm's is its global prefix (usually %APPDATA%\\npm); WinGet links into %LOCALAPPDATA%\\Microsoft\\WinGet\\Links."],
+    does: ["V: for an install that is not from npm (the desktop app's bundle here), claude doctor prints the same: \"Native installation exists but ...\\.local\\bin is not in your PATH\" (2.1.295 and 2.1.299). For an npm install (2.1.301 in CI) it says \"No installation issues found\" and nothing about PATH.", "D: the native installer's folder is %USERPROFILE%\\.local\\bin; npm's is its global prefix (usually %APPDATA%\\npm); WinGet links into %LOCALAPPDATA%\\Microsoft\\WinGet\\Links."],
     fix: ["Add the folder to the user PATH (System Properties, Environment Variables, Path, New), then open a new terminal."],
     issues: [],
   },

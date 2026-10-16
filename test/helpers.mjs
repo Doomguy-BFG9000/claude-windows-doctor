@@ -42,9 +42,8 @@ Object.assign(process.env, {
   NO_COLOR: "1",
 });
 delete process.env.FORCE_COLOR;
-delete process.env.CLAUDE_PROJECT_DIR;
-delete process.env.CLAUDECODE;
-for (const k of Object.keys(process.env)) if (/^(CLAUDE_CODE_|ANTHROPIC_)/.test(k)) delete process.env[k];
+// nothing of the machine's Claude Code session may leak into a test: every CLAUDE_*, ANTHROPIC_* and CLAUDECODE* variable goes, except the two this file sets
+for (const k of Object.keys(process.env)) if (/^(CLAUDE|ANTHROPIC|AI_AGENT|MCP_|ENABLE_TOOL_SEARCH)/i.test(k) && !/^CLAUDE_(CONFIG_DIR|WINDOWS_DOCTOR_)/i.test(k)) delete process.env[k];
 
 const underTmp = (p) => path.resolve(p).toLowerCase().startsWith(fs.realpathSync.native(os.tmpdir()).toLowerCase());
 const configDirOf = (e) => e.CLAUDE_CONFIG_DIR || path.join((process.platform === "win32" ? e.USERPROFILE || e.HOME : e.HOME) || "", ".claude");

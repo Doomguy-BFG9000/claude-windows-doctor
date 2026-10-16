@@ -18,7 +18,9 @@ import { findClaudes, versionOf } from "../src/binaries.mjs";
 import { compareUserEnv } from "../src/userenv.mjs";
 
 const skip = !IS_WIN && "this reads the real Windows";
-const ps = (command) => spawnSync(path.join(process.env.SystemRoot || "C:\\Windows", "System32", "WindowsPowerShell", "v1.0", "powershell.exe"), ["-NoProfile", "-NonInteractive", "-Command", command], { encoding: "utf8", windowsHide: true, input: "" }).stdout.trim();
+// no PSModulePath: a Windows PowerShell started from PowerShell 7 (as on a CI runner) would otherwise load the modules of 7 and fail
+const psEnv = Object.fromEntries(Object.entries(process.env).filter(([k]) => k.toLowerCase() !== "psmodulepath"));
+const ps = (command) => spawnSync(path.join(process.env.SystemRoot || "C:\\Windows", "System32", "WindowsPowerShell", "v1.0", "powershell.exe"), ["-NoProfile", "-NonInteractive", "-Command", command], { encoding: "utf8", windowsHide: true, input: "", env: psEnv }).stdout.trim();
 
 test("the user environment: the real HKCU\\Environment is listed through reg.exe, read value by value the same, and has the names that every Windows user has", { skip }, () => {
   const sys = makeSys();

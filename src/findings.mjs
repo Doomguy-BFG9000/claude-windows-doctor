@@ -100,7 +100,7 @@ export function windowsFindings(facts) {
     const e = clis[0];
     out.push(f("claude-not-on-path", "warning", `claude is installed (${e.path}, ${ORIGIN_TEXT[e.origin]}${e.version ? `, ${e.version}` : ""}), but its folder is not on PATH.`, {
       effect: 'A terminal says "claude is not recognized".',
-      fix: `Add ${e.dir} to the user PATH (System Properties, Environment Variables), then open a new terminal; claude doctor says the same.`,
+      fix: `Add ${e.dir} to the user PATH (System Properties, Environment Variables), then open a new terminal.`,
     }));
   }
   const distinct = clis.filter((e, i, a) => a.findIndex((x) => x.origin === e.origin && x.dir === e.dir) === i);

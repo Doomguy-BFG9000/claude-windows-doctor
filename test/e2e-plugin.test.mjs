@@ -110,6 +110,12 @@ test("the report that the model gets from the command, measured: 3 findings, and
       assert.match(text, /## windows-doctor check/);
       const lines = text.trim().split("\n");
       figures[label] = { chars: text.length, lines: lines.length, findings: lines.filter((l) => l.startsWith("- ")).length };
+      if (!IS_WIN) {
+        // on Linux and macOS there is nothing to check: the Bash tool ran the command with no prompt, and the answer is the two lines
+        assert.match(text, /^## windows-doctor check\nNothing to check on (Linux|macOS): /);
+        assert.equal(lines.length, 2);
+        continue;
+      }
       if (label === "at the cap") {
         assert.equal(lines.filter((l) => l.startsWith("- WARNING")).length, 12);
         assert.match(lines.at(-1), /^- \.\.\. and \d+ more \(run `claude-windows-doctor check`\)$/);
@@ -133,7 +139,7 @@ test("a skill whose command line exits 1 never reaches the model, and the same s
     fs.writeFileSync(path.join(plug, "skills", "check", "SKILL.md"), ["---", "name: check", "description: Check the Windows setup.", "disable-model-invocation: true", "allowed-tools: Bash(node *) PowerShell(node *)", "---", "", `!\`${line}\``, "", "In at most 10 lines: say what it is.", ""].join("\n"));
     const api = await fakeApi();
     try {
-      const r = await runClaude(sb, api, ["-p", "/wd-fail:check", "--plugin-dir", plug, "--output-format", "json", "--permission-mode", "default"], { env: { Path: PATH_ENV, ...(IS_WIN ? { CLAUDE_CODE_USE_POWERSHELL_TOOL: "1" } : {}) } });
+      const r = await runClaude(sb, api, ["-p", "/wd-fail:check", "--plugin-dir", plug, "--output-format", "json", "--permission-mode", "default"], { env: { [IS_WIN ? "Path" : "PATH"]: PATH_ENV, ...(IS_WIN ? { CLAUDE_CODE_USE_POWERSHELL_TOOL: "1" } : {}) } });
       assert.equal(r.code, 0, r.err);
       seen[variant] = { requests: api.requests.length, reached: Boolean(withSkill(api)) };
     } finally { await api.close(); }
@@ -169,7 +175,8 @@ test("when the shell tool is not allowed for the command, Claude Code hands the 
   const copy = path.join(tmpDir("cwd-plug-"), "plugin");
   for (const item of ["bin", "src", "skills", ".claude-plugin", "package.json"]) fs.cpSync(path.join(ROOT, item), path.join(copy, item), { recursive: true });
   const skillFile = path.join(copy, "skills", "check", "SKILL.md");
-  const text = fs.readFileSync(skillFile, "utf8");
+  // a checkout on Windows may have turned the line feeds into CRLF
+  const text = fs.readFileSync(skillFile, "utf8").replace(/\r\n/g, "\n");
   assert.match(text, /^allowed-tools: .*\n/m);
   fs.writeFileSync(skillFile, text.replace(/^allowed-tools: .*\n/m, ""));
   const sb = sandbox("runfirst");

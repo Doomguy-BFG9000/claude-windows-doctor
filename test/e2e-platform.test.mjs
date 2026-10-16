@@ -147,6 +147,8 @@ test("claude doctor, in a throwaway world: a native install whose folder is not 
   const text = `${r.out}${r.err}`.replace(/\x1b\[[0-9;]*m/g, "");
   t.diagnostic(`claude doctor on ${claudeInfo().number}: ${text.split("\n").filter((l) => /PATH|Feature-flag|flag/i.test(l)).map((l) => l.trim()).join(" | ")}`);
   assert.equal(r.code, 0, text);
-  assert.match(text, /not in your PATH/i);
   assert.match(text, /Feature-flag evaluation disabled \(disabled by CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC\)/);
+  // only an install that is not from npm (the desktop app's bundle, the native installer) has a folder that doctor wants on PATH
+  if (/^Running: npm/m.test(text)) assert.doesNotMatch(text, /not in your PATH/i, "an npm install has no such line");
+  else assert.match(text, /Native installation exists but .* is not in your PATH/i);
 });
