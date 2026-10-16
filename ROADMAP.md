@@ -1,0 +1,9 @@
+# Roadmap
+
+What could come next. None of it is promised; all of it is open to contributors. Comment on an issue or start a [discussion](https://github.com/nrzz/claude-windows-doctor/discussions) before a large change.
+
+- `explain --list`: print every finding id with its title, so that `explain` can be browsed without reading the usage error. This is the open good first issue: [#1](https://github.com/nrzz/claude-windows-doctor/issues/1).
+- Windows 10 and ARM64: the real-binary checks were run on Windows 11 on x64 and on the `windows-latest` runner only. A run of `claude-windows-doctor check --live` on Windows 10, or on a Windows on ARM machine, with what it printed, would show whether the Git Bash search and the registry reads behave the same there.
+- The PowerShell tool when Git Bash is found and `CLAUDE_CODE_USE_POWERSHELL_TOOL` is not set: Claude Code decides with a flag from its server, which the throwaway runs of the real binary cannot see (they switch non-essential traffic off), so `check` says "decided by your account" and quotes the documentation. Find out where Claude Code caches that flag, if it does, and say yes or no from it.
+- `check` inside a real WSL distribution: the WSL side is held to a pretend machine in the tests, not to a distribution. A CI job on `windows-latest` that installs a distribution and runs the checks in it would put it to a real one.
+- Managed settings: the registry policy (`SOFTWARE\Policies\ClaudeCode`) and `C:\Program Files\ClaudeCode\managed-settings.json` are read the way the documentation describes and are not put to the binary, because writing them needs an administrator. The `windows-latest` runner has one, so a CI job could write each and compare `check` with the tools the binary lists.
