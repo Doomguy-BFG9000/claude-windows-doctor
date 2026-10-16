@@ -1,0 +1,46 @@
+name: Feature request
+description: An idea for claude-windows-doctor
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What are you trying to do with Claude Code on Windows (or in WSL), and what gets in the way? A link to the Claude Code issue helps.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: The idea
+      description: How should it work? What should `check` say, or what should a command do?
+    validations:
+      required: true
+  - type: dropdown
+    id: tokens
+    attributes:
+      label: Token cost
+      description: Would it put anything new in front of Claude? Every user pays for that.
+      options:
+        - "No: it runs outside the model"
+        - "Only when the user asks for it"
+        - "A few tokens per session"
+        - "Not sure"
+    validations:
+      required: true
+  - type: dropdown
+    id: changes
+    attributes:
+      label: Would it change anything on the computer?
+      description: Today only `fix --git-bash` and `undo` do, and they change one value of the user environment.
+      options:
+        - "No: it only reads"
+        - "Yes: it would write something (say what in the idea)"
+        - "Not sure"
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered

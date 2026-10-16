@@ -1,0 +1,44 @@
+name: e2e
+
+# The checks that run the real Claude Code: which shell tools the first request lists for every case of test/shell-table.mjs (fake Git
+# trees, PATH orders, variables, settings files, deny rules), which bash.exe the binary says it took, the PowerShell edition, what
+# defaultShell changes (nothing), the execution policy, line endings, the code page and long paths, the plugin and its skill, and
+# `check --live`. They cost nothing: Claude Code talks to a fake server on 127.0.0.1. On Windows (windows-latest has Git at
+# C:\Program Files\Git, the case that this machine's author could not make by hand) they run in full; on Linux and macOS the checks that are
+# about Windows skip, and the plugin and the nothing-to-check answer are put to the binary. Optional by design: if the binary cannot be
+# installed, the checks skip. Weekly, so a Claude Code release that changes how it finds its shell shows up here.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "23 6 * * 1"
+  workflow_dispatch:
+    inputs:
+      claude_version:
+        description: "Version of @anthropic-ai/claude-code to install (default: the newest)"
+        required: false
+        default: "latest"
+
+jobs:
+  claude:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Install the Claude Code CLI (the checks skip if this fails)
+        run: npm install -g @anthropic-ai/claude-code@${{ inputs.claude_version || 'latest' }}
+        continue-on-error: true
+      - run: claude --version
+        continue-on-error: true
+      - name: Real-binary checks
+        run: node --test --test-concurrency=1 test/e2e-shell.test.mjs test/e2e-platform.test.mjs test/windows.test.mjs test/e2e-live.test.mjs test/e2e-plugin.test.mjs
+        env:
+          E2E_CLAUDE: claude
