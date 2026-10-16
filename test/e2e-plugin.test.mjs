@@ -186,7 +186,8 @@ test("when the shell tool is not allowed for the command, Claude Code hands the 
     assert.equal(r.code, 0, r.err);
     const skillText = textBlocks(withSkill(api) || mainRequest(api)).find((b) => b.startsWith("Base directory for this skill"));
     assert.ok(skillText, "the skill reached the model");
-    assert.match(skillText, /\[run this first, exactly as written, with the PowerShell tool and use its output: `node "[^"]+claude-windows-doctor\.mjs" check --project "[^"]+" --markdown`\]\n\nAt most 10 lines: the shell the Bash tool gets/);
+    // 2.1.295 and 2.1.299 name the tool ("with the PowerShell tool") when it is the only shell tool; 2.1.301 on a runner that has both does not
+    assert.match(skillText, /\[run this first, exactly as written, (?:with the PowerShell tool )?and use its output: `node "[^"]+claude-windows-doctor\.mjs" check --project "[^"]+" --markdown`\]\n\nAt most 10 lines: the shell the Bash tool gets/);
     assert.ok(skillText.includes(`--project "${fwd(sb.work)}"`), "the project folder is filled in");
   } finally { await api.close(); }
 });
