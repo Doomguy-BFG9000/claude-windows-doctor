@@ -30,6 +30,7 @@ export function resolveBashArg(sys, arg) {
     if (sys.isFile(p)) return { ok: true, path: p };
   }
   if (sys.isDir(raw)) return { ok: false, message: `no bash.exe in ${raw} (pass the file, or a Git for Windows folder with bin\\bash.exe in it)` };
+  if (!sys.exists(raw)) return { ok: false, message: `${raw} does not exist` };
   return { ok: false, message: file.state === "not-bash" ? `${raw} is not a bash.exe (the file must be named bash.exe, sh.exe, bash or sh)` : `${raw} does not exist` };
 }
 

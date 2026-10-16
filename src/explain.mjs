@@ -237,7 +237,8 @@ const MARK = { V: "verified", D: "documented", N: "not verified" };
 
 /** A page by id, with each line of `does` split into its mark and text, or null. */
 export function pageFor(id) {
-  const p = PAGES.find((x) => x.id === id);
+  const key = String(id).trim().toLowerCase();
+  const p = PAGES.find((x) => x.id === key);
   if (!p) return null;
   return { ...p, does: p.does.map((line) => { const m = /^([VDN]): (.*)$/s.exec(line); return m ? { source: MARK[m[1]], text: m[2] } : { source: null, text: line }; }) };
 }

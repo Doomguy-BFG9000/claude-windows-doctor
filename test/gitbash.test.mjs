@@ -40,5 +40,6 @@ test("resolveBashArg: a bash.exe, a Git folder, a Git bin folder, and what is re
   assert.match(resolveBashArg(sys, "D:\\x\\git-bash.exe").message, /is not a bash\.exe/);
   assert.match(resolveBashArg(sys, "D:\\empty").message, /no bash\.exe in D:\\empty/);
   assert.match(resolveBashArg(sys, "D:\\nothing\\bash.exe").message, /does not exist/);
+  assert.match(resolveBashArg(sys, "D:\\nothing\\anywhere").message, /does not exist/, "a path that is not there says so, whatever its name");
   assert.match(resolveBashArg(sys, "bin\\bash.exe").message, /absolute path/);
 });
