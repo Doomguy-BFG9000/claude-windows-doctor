@@ -1,0 +1,15 @@
+{
+  "name": "windows-doctor",
+  "displayName": "Windows Doctor",
+  "version": "1.0.0",
+  "description": "Which shell Claude Code's Bash tool gets on Windows and why, every claude on PATH, and the setup problems behind the common Windows issues. One user-only skill: /windows-doctor:check.",
+  "author": { "name": "Naresh Prabu" },
+  "homepage": "https://github.com/nrzz/claude-windows-doctor",
+  "repository": "https://github.com/nrzz/claude-windows-doctor",
+  "documentationUrl": "https://github.com/nrzz/claude-windows-doctor#readme",
+  "supportUrl": "https://github.com/nrzz/claude-windows-doctor/issues",
+  "privacyPolicyUrl": "https://github.com/nrzz/claude-windows-doctor#privacy",
+  "termsOfServiceUrl": "https://github.com/nrzz/claude-windows-doctor/blob/main/LICENSE",
+  "license": "MIT",
+  "keywords": ["windows", "git-bash", "powershell", "wsl", "shell", "diagnostics"]
+}

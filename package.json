@@ -1,0 +1,39 @@
+{
+  "name": "claude-windows-doctor",
+  "version": "1.0.0",
+  "description": "Which shell Claude Code's Bash tool gets on Windows and why, every claude on PATH and which one runs, and the setup problems behind the common Windows issues: Git Bash, PowerShell, WSL, long paths, line endings. Proves the shell choice with the real binary. Zero tokens.",
+  "type": "module",
+  "bin": {
+    "claude-windows-doctor": "bin/claude-windows-doctor.mjs"
+  },
+  "files": [
+    "bin",
+    "src",
+    ".claude-plugin",
+    "skills",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "repository": "github:nrzz/claude-windows-doctor",
+  "homepage": "https://nrzz.github.io/claude-code-toolkit/",
+  "bugs": "https://github.com/nrzz/claude-windows-doctor/issues",
+  "keywords": [
+    "claude",
+    "claude-code",
+    "anthropic",
+    "windows",
+    "git-bash",
+    "powershell",
+    "wsl",
+    "shell",
+    "diagnostics"
+  ],
+  "author": "Naresh Prabu",
+  "license": "MIT"
+}
