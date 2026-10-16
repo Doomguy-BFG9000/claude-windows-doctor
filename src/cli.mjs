@@ -40,9 +40,9 @@ Change (Windows only; they set and remove one value of the user environment, and
            put back what fix recorded: the old value with its old type, or no value at all, and
            delete the record
 
-Options for every command:
-  --project <dir>   the folder Claude Code starts in (default: the folder you are in)
-  --json            one JSON document on stdout
+Options:
+  --json            one JSON document on stdout (every command)
+  --project <dir>   the folder Claude Code starts in (default: the folder you are in); check and fix
   -h, --help        this text
   -v, --version     the version
 
@@ -59,7 +59,7 @@ const COMMANDS = {
   check: { options: ["project", "json", "markdown", "live", "claude"], positional: 0 },
   explain: { options: ["json"], positional: 1, required: true },
   fix: { options: ["project", "json", "dryRun", "gitBash", "path"], positional: 0 },
-  undo: { options: ["project", "json", "dryRun"], positional: 0 },
+  undo: { options: ["json", "dryRun"], positional: 0 },
 };
 
 const FLAGS = { "--json": "json", "--markdown": "markdown", "--live": "live", "--dry-run": "dryRun", "--git-bash": "gitBash", "-h": "help", "--help": "help", "-v": "version", "--version": "version" };

@@ -135,7 +135,7 @@ export const PAGES = [
   {
     id: "node-for-npm", title: "Node is older than the npm package of Claude Code wants",
     means: "The npm package of Claude Code wants Node 22 or later.",
-    does: ["D: on an older Node npm prints an EBADENGINE warning; the install completes and claude still runs, because the package downloads a native binary that does not use your Node at run time."],
+    does: ["V: the package metadata of 2.1.301 (npm view @anthropic-ai/claude-code engines) says node >=22.0.0, and its bin is a claude.exe.", "D: on an older Node npm prints an EBADENGINE warning; the install completes and claude still runs, because the program is a native binary that does not use your Node at run time."],
     fix: ["Nothing, if claude runs. For a clean install: Node 22 or later, or the native installer."],
     issues: [],
   },

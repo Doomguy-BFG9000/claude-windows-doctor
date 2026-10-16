@@ -47,6 +47,8 @@ test("parseArgs: every command and option, and every usage error with its words"
   bad(["fix", "--path", "x"], /fix needs what to fix: --git-bash/);
   bad(["undo", "--git-bash"], /undo does not take --git-bash/);
   bad(["undo", "--path", "x"], /undo does not take --path/);
+  bad(["undo", "--project", "x"], /undo does not take --project/);
+  bad(["explain", "git-bash-not-found", "--project", "x"], /explain does not take --project/);
 });
 
 test("--help is the usage block, --version the version, and both exit 0; a usage error exits 2 with a line on stderr, or a JSON document with --json", async () => {
