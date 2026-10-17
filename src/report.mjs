@@ -269,6 +269,15 @@ export function fixJson(r) {
 }
 
 // ---- explain
+export function explainListText(pages) {
+  const width = Math.max(...pages.map((p) => p.id.length));
+  return `${pages.map((p) => `${p.id.padEnd(width)}   ${p.title}`).join("\n")}\n`;
+}
+
+export function explainListJson(pages) {
+  return { ok: true, findings: pages };
+}
+
 export function explainText(p) {
   const out = [`${p.id}   ${p.title}`, "", p.means, "", "What Claude Code does"];
   for (const d of p.does) out.push(`  - ${d.source ? `(${d.source}) ` : ""}${d.text}`);

@@ -2,6 +2,10 @@
 
 All notable changes to claude-windows-doctor are written here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+- Add `explain --list`, with text and JSON output, to list every finding id and title.
+
 ## [1.0.0] - 2026-10-16
 
 - First release. A CLI and a Claude Code plugin with one user-only skill, `/windows-doctor:check`.
@@ -14,3 +18,5 @@ All notable changes to claude-windows-doctor are written here. The format follow
 - Zero tokens for the tool. The skill is user-only, adds nothing to a request that does not use it, and hands the model a report of at most 12 findings.
 
 [1.0.0]: https://github.com/nrzz/claude-windows-doctor/releases/tag/v1.0.0
+
+[Unreleased]: https://github.com/nrzz/claude-windows-doctor/compare/v1.0.0...HEAD

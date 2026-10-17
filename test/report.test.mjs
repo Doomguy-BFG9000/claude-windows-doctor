@@ -5,8 +5,8 @@ import assert from "node:assert/strict";
 import { fakeMachine } from "./machine.mjs";
 import { HOME, PROJECT, collect, winMachine } from "./win-machine.mjs";
 import { collectWsl, notApplicable } from "../src/check.mjs";
-import { checkJson, checkMarkdown, checkText, explainText, fixJson, fixText } from "../src/report.mjs";
-import { pageFor } from "../src/explain.mjs";
+import { checkJson, checkMarkdown, checkText, explainListJson, explainListText, explainText, fixJson, fixText } from "../src/report.mjs";
+import { listPages, pageFor } from "../src/explain.mjs";
 
 const SECRET = "sk-ant-api03-SECRET-VALUE-0123456789";
 const E_GIT = ["E:\\Das\\Git\\cmd\\git.exe", "E:\\Das\\Git\\mingw64\\bin\\git.exe", "E:\\Das\\Git\\bin\\bash.exe"];
@@ -14,6 +14,14 @@ const spoiled = () => winMachine({
   noGit: true, files: E_GIT, registry: { "HKLM\\SOFTWARE\\GitForWindows": { InstallPath: ["REG_SZ", "E:\\Das\\Git"] }, "HKCU\\Environment": { ANTHROPIC_API_KEY: ["REG_SZ", `${SECRET}-USER`], CLAUDE_CONFIG_DIR: ["REG_SZ", "D:\\cfg"], ANTHROPIC_AUTH_TOKEN: ["REG_SZ", "tok-user"] } },
   env: { Path: `${HOME}\\.local\\bin;E:\\Das\\Git\\mingw64\\bin;E:\\Das\\Git\\cmd;C:\\Windows\\System32;C:\\Windows`, ANTHROPIC_API_KEY: `${SECRET}-PROCESS`, ANTHROPIC_AUTH_TOKEN: "tok-proc", CLAUDE_CODE_OAUTH_TOKEN: "oauth-proc", ANTHROPIC_BASE_URL: "https://gateway.example/v1", CLAUDE_CODE_USE_POWERSHELL_TOOL: "enabled" },
   texts: { [`${HOME}\\.claude\\settings.json`]: JSON.stringify({ env: { ANTHROPIC_API_KEY: "sk-from-settings", CLAUDE_CODE_USE_POWERSHELL_TOOL: "1" }, defaultShell: "powershell" }) },
+});
+
+test("the explain list is aligned text and a JSON document with every id and title", () => {
+  const pages = listPages();
+  const lines = explainListText(pages).trimEnd().split("\n");
+  const width = Math.max(...pages.map((p) => p.id.length));
+  assert.deepEqual(lines, pages.map((p) => `${p.id.padEnd(width)}   ${p.title}`));
+  assert.deepEqual(explainListJson(pages), { ok: true, findings: pages });
 });
 
 test("no secret is in the text, the markdown or the JSON: a token in the environment, in the registry or in a settings file is set, never its value", () => {
