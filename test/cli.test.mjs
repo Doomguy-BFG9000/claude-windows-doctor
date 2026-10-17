@@ -76,7 +76,7 @@ test("check on a clean pretend machine: exit 0, the report, JSON that parses, ma
   const sys = winMachine();
   const t = await run(["check", "--project", PROJECT], { sys: winMachine() });
   assert.equal(t.code, 0, t.all);
-  assert.match(t.out, /^claude-windows-doctor 1\.0\.0 {2}the Windows setup of Claude Code\n/);
+  assert.match(t.out, /^claude-windows-doctor 1\.1\.0 {2}the Windows setup of Claude Code\n/);
   assert.match(t.out, /Bash tool {9}yes: Git Bash at C:\\Program Files\\Git\\bin\\bash\.exe \(the fixed path C:\\Program Files\\Git\)/);
   assert.match(t.out, /No findings\.\n$/);
   const j = await run(["check", "--json"], { sys });
@@ -129,7 +129,7 @@ test("on Linux and macOS there is nothing to check, said in every form, with exi
     const sys = () => fakeMachine({ platform });
     const t = await run(["check"], { sys: sys() });
     assert.equal(t.code, 0);
-    assert.match(t.out, /^claude-windows-doctor 1\.0\.0 {2}nothing to check\nNothing to check on (Linux|macOS): claude-windows-doctor checks the setup of Claude Code on Windows/);
+    assert.match(t.out, /^claude-windows-doctor 1\.1\.0 {2}nothing to check\nNothing to check on (Linux|macOS): claude-windows-doctor checks the setup of Claude Code on Windows/);
     const j = (await run(["check", "--json"], { sys: sys() })).json();
     assert.deepEqual([j.ok, j.applicable, j.platform, j.kind], [true, false, platform, "other"]);
     const m = await run(["check", "--markdown"], { sys: sys() });

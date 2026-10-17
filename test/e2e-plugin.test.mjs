@@ -171,7 +171,7 @@ test("installed from a marketplace, the plugin's own cost projection is small an
   t.diagnostic(`claude plugin details on ${claudeInfo().number}: ${always[0].replace(/\s+/g, " ")}; per component: ${row ? row[0].trim().replace(/\s+/g, " ") : "(no row)"}`);
 });
 
-test("when the shell tool is not allowed for the command, Claude Code hands the model the command line as 'run this first', and the skill text reads right that way too (Windows, PowerShell tool)", { skip: skip() || (!IS_WIN && "this is how the PowerShell tool of a Windows setup behaves here"), timeout: 300000 }, async () => {
+test("when the shell tool is not allowed for the command, Claude Code hands the model the command line as 'run this first' (to 2.1.301) or ends the turn with no request (2.1.302), and the skill text reads right either way (Windows, PowerShell tool)", { skip: skip() || (!IS_WIN && "this is how the PowerShell tool of a Windows setup behaves here"), timeout: 300000 }, async (t) => {
   const copy = path.join(tmpDir("cwd-plug-"), "plugin");
   for (const item of ["bin", "src", "skills", ".claude-plugin", "package.json"]) fs.cpSync(path.join(ROOT, item), path.join(copy, item), { recursive: true });
   const skillFile = path.join(copy, "skills", "check", "SKILL.md");
@@ -184,7 +184,15 @@ test("when the shell tool is not allowed for the command, Claude Code hands the 
   try {
     const r = await runClaude(sb, api, ["-p", "/windows-doctor:check", "--plugin-dir", copy, "--output-format", "json"], { env: { CLAUDE_CODE_USE_POWERSHELL_TOOL: "1", CLAUDE_CODE_GIT_BASH_PATH: "C:/nonexistent/bash.exe" } });
     assert.equal(r.code, 0, r.err);
-    const skillText = textBlocks(withSkill(api) || mainRequest(api)).find((b) => b.startsWith("Base directory for this skill"));
+    const req = withSkill(api) || mainRequest(api);
+    if (!req) {
+      // 2.1.302: a skill whose command is not allowed ends the turn with no request to the model, an empty result and no turn
+      assert.equal(api.requests.length, 0);
+      assert.ok(r.result && r.result.num_turns === 0 && r.result.result === "", `no request, and the result document says so: ${String(r.out).slice(0, 300)}`);
+      t.diagnostic(`on Claude Code ${claudeInfo().number} a skill whose command is not allowed ends the turn with no request (num_turns 0, an empty result)`);
+      return;
+    }
+    const skillText = textBlocks(req).find((b) => b.startsWith("Base directory for this skill"));
     assert.ok(skillText, "the skill reached the model");
     // 2.1.295 and 2.1.299 name the tool ("with the PowerShell tool") when it is the only shell tool; 2.1.301 on a runner that has both does not
     assert.match(skillText, /\[run this first, exactly as written, (?:with the PowerShell tool )?and use its output: `node "[^"]+claude-windows-doctor\.mjs" check --project "[^"]+" --markdown`\]\n\nAt most 10 lines: the shell the Bash tool gets/);

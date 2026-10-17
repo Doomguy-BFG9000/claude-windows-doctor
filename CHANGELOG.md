@@ -4,7 +4,11 @@ All notable changes to claude-windows-doctor are written here. The format follow
 
 ## [Unreleased]
 
-- Add `explain --list`, with text and JSON output, to list every finding id and title.
+## [1.1.0] - 2026-10-17
+
+- `explain --list` prints every finding id with its title, in the order of the pages, the id padded to the longest; `--json` gives `{ ok, findings: [ { id, title } ] }`. `explain` with neither an id nor `--list` is still a usage error (exit 2), and `--list` together with an id is one too.
+- Contributed by [@Doomguy-BFG9000](https://github.com/Doomguy-BFG9000) in [#2](https://github.com/nrzz/claude-windows-doctor/pull/2), the first outside pull request, for the good first issue [#1](https://github.com/nrzz/claude-windows-doctor/issues/1).
+- The real-binary check of the skill's hand-off accepts what Claude Code 2.1.302 does: a skill whose command is not allowed ends the turn with no request to the model, an empty result and `num_turns` 0, where 2.1.301 and earlier handed the model the command line as "run this first". The README records it.
 
 ## [1.0.0] - 2026-10-16
 
@@ -17,6 +21,7 @@ All notable changes to claude-windows-doctor are written here. The format follow
 - What Claude Code does is what the real binary did: `test/shell-table.mjs` holds 129 cases (fake Git trees, PATH orders, spellings of the two variables, settings files, deny rules, `defaultShell`) that were put to Claude Code 2.1.295 and 2.1.299 on Windows 11 and, in CI, to the newest release (2.1.301) on `windows-latest`, and the same table is held against the prediction on a pretend Windows machine on every system. Git Bash is looked for in `CLAUDE_CODE_GIT_BASH_PATH`, then `C:\Program Files\Git` and `C:\Program Files (x86)\Git`, then two folders up from the first `git.exe` that `where.exe` prints; a variable that points at a missing file is ignored and the search goes on.
 - Zero tokens for the tool. The skill is user-only, adds nothing to a request that does not use it, and hands the model a report of at most 12 findings.
 
+[1.1.0]: https://github.com/nrzz/claude-windows-doctor/releases/tag/v1.1.0
 [1.0.0]: https://github.com/nrzz/claude-windows-doctor/releases/tag/v1.0.0
 
 [Unreleased]: https://github.com/nrzz/claude-windows-doctor/compare/v1.0.0...HEAD

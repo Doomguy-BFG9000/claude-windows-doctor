@@ -50,7 +50,7 @@ test("check --live: a valid CLAUDE_CODE_GIT_BASH_PATH: the binary lists Bash, ta
   // the text form of the same run says so in words
   const e = { ...w.env }; setVar(e, "Path", SYSTEM_PATH); setVar(e, "CLAUDE_CODE_GIT_BASH_PATH", bash);
   const text = await run(["check", "--live", "--claude", CLAUDE, "--project", w.work], { sys: makeSys({ env: e, cwd: w.work, home: w.home }), userEnv: fileUserEnv(w.userEnvFile) });
-  assert.match(text.out, /live {14}proved with the real claude \S+ \(.*claude\.exe\), through a fake API on 127\.0\.0\.1 \(no token spent\):/);
+  assert.match(text.out, /live {14}proved with the real claude \S+ \(.*claude(?:\.exe|\.cmd)?\), through a fake API on 127\.0\.0\.1 \(no token spent\):/);
   assert.match(text.out, /the first request listed Bash, and it took /);
 });
 

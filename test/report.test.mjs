@@ -137,7 +137,7 @@ test("WSL's report and markdown, and the nothing-to-check report", () => {
   assert.match(checkMarkdown(f), /^## windows-doctor check \(WSL\): \/home\/me\/code\nclaude runs from \/mnt\/c\/Users\/me\/\.local\/bin\/claude \(2\.1\.299\)\. 0 errors, 1 warning, 0 notes\.\n- WARNING `wsl-windows-claude`/);
   assert.deepEqual(Object.keys(checkJson(f)), ["ok", "applicable", "platform", "kind", "project", "system", "binaries", "locations", "wslInherits", "findings", "counts"]);
   const n = notApplicable(fakeMachine({ platform: "darwin" }));
-  assert.match(checkText(n), /^claude-windows-doctor 1\.0\.0 {2}nothing to check\nNothing to check on macOS: /);
+  assert.match(checkText(n), /^claude-windows-doctor 1\.1\.0 {2}nothing to check\nNothing to check on macOS: /);
   assert.deepEqual(Object.keys(checkJson(n)), ["ok", "applicable", "platform", "kind", "system", "message", "findings", "counts"]);
 });
 

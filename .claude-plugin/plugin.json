@@ -1,7 +1,7 @@
 {
   "name": "windows-doctor",
   "displayName": "Windows Doctor",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Which shell Claude Code's Bash tool gets on Windows and why, every claude on PATH, and the setup problems behind the common Windows issues. One user-only skill: /windows-doctor:check.",
   "author": { "name": "Naresh Prabu" },
   "homepage": "https://github.com/nrzz/claude-windows-doctor",
