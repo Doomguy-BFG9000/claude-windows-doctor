@@ -168,8 +168,12 @@ test("explain: a page, the list as text and JSON, an id that is not one (exit 1,
   const t = await run(["explain", "wsl-no-distro"]);
   assert.equal(t.code, 0);
   assert.match(t.out, /^wsl-no-distro {3}WSL has only the distributions of other tools\n/);
+  const part = await run(["explain", "distro"]);
+  assert.equal(part.code, 0);
+  assert.match(part.out, /^wsl-no-distro {3}WSL has only the distributions of other tools\n/);
   const j = (await run(["explain", "wsl-no-distro", "--json"])).json();
   assert.equal(j.id, "wsl-no-distro");
+  assert.equal((await run(["explain", "distro", "--json"])).json().id, "wsl-no-distro");
   const list = await run(["explain", "--list"]);
   assert.equal(list.code, 0);
   assert.match(list.out, /^no-shell-tool +Claude Code will not start: no Git Bash and the PowerShell tool is off\n/);

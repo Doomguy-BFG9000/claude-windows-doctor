@@ -313,7 +313,7 @@ No record of a fix was found (looked at C:\Users\me\.claude\windows-doctor\recor
 
 ### `explain`
 
-`explain <finding-id>` prints the page of a finding (the id may be written in any case). `explain --list` prints every finding id with its title; add `--json` for a document with the same entries. Each line under "What Claude Code does" is marked: *verified* (seen in a real run, of the binary or of the Windows program the line names), *documented* (from Claude Code's, Windows' or git's documentation) or *not verified*. Exit 1 for an id that is not one, with the nearest ids.
+`explain <finding-id>` prints the page of a finding; the id may be written in any case or shortened to a part that matches exactly one id. `explain --list` prints every finding id with its title; add `--json` for a document with the same entries. Each line under "What Claude Code does" is marked: *verified* (seen in a real run, of the binary or of the Windows program the line names), *documented* (from Claude Code's, Windows' or git's documentation) or *not verified*. Exit 1 for an unknown or ambiguous id, with the nearest ids.
 
 ```text
 $ claude-windows-doctor explain git-bash-not-found

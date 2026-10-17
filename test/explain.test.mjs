@@ -66,9 +66,13 @@ test("the pages say what the binary was seen to do in the words of the README: t
   assert.match(explainText(pageFor("git-bash-path-project-settings")), /user settings .* was used .* the same value in the env of the project settings, and of the local settings, was not/s);
 });
 
-test("an id is found whatever its case and the spaces around it; an id that is not one is null", () => {
+test("an exact id or its unique part is found; an ambiguous part and an unknown id are null", () => {
   assert.equal(pageFor("GIT-BASH-NOT-FOUND").id, "git-bash-not-found");
   assert.equal(pageFor("  Long-Paths ").id, "long-paths");
+  assert.equal(pageFor("long").id, "long-paths");
+  assert.equal(pageFor("distro").id, "wsl-no-distro");
+  assert.equal(pageFor("autocrlf").id, "autocrlf");
+  assert.equal(pageFor("git-bash"), null);
   assert.equal(pageFor("nosuch"), null);
   assert.equal(pageFor(""), null);
 });

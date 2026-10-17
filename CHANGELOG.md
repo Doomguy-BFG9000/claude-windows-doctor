@@ -4,6 +4,8 @@ All notable changes to claude-windows-doctor are written here. The format follow
 
 ## [Unreleased]
 
+- Let `explain` accept a part of a finding id when it matches exactly one id.
+
 ## [1.1.0] - 2026-10-17
 
 - `explain --list` prints every finding id with its title, in the order of the pages, the id padded to the longest; `--json` gives `{ ok, findings: [ { id, title } ] }`. `explain` with neither an id nor `--list` is still a usage error (exit 2), and `--list` together with an id is one too.
