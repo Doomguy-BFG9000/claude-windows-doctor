@@ -9,6 +9,7 @@ import { HELP, parseArgs } from "../src/cli.mjs";
 import { REAL_KEY, regUserEnv } from "../src/winenv.mjs";
 import { RECORD_SCHEMA } from "../src/write.mjs";
 import { VERSION } from "../src/version.mjs";
+import { IDS } from "../src/explain.mjs";
 
 const E_GIT = ["E:\\Das\\Git\\cmd\\git.exe", "E:\\Das\\Git\\mingw64\\bin\\git.exe", "E:\\Das\\Git\\bin\\bash.exe"];
 const memStore = () => {
@@ -23,6 +24,8 @@ test("parseArgs: every command and option, and every usage error with its words"
   ok(["check", "--live", "--claude", "C:\\x\\claude.exe", "--project", "D:\\p", "--json"], { live: true, claude: "C:\\x\\claude.exe", project: "D:\\p", json: true });
   ok(["check", "--markdown", "--project=D:\\p"], { markdown: true, project: "D:\\p" });
   ok(["explain", "git-bash-not-found", "--json"], { command: "explain", id: "git-bash-not-found", json: true });
+  ok(["explain", "--list"], { command: "explain", id: null, list: true });
+  ok(["explain", "--list", "--json"], { command: "explain", id: null, list: true, json: true });
   ok(["fix", "--git-bash", "--path", "E:\\Git\\bin\\bash.exe", "--dry-run"], { gitBash: true, path: "E:\\Git\\bin\\bash.exe", dryRun: true });
   ok(["undo", "--dry-run", "--json"], { command: "undo", dryRun: true, json: true });
   ok(["--help"], { help: true });
@@ -39,9 +42,14 @@ test("parseArgs: every command and option, and every usage error with its words"
   bad(["check", "--markdown", "--live"], /--markdown is the short report of the skill and does not run --live/);
   bad(["check", "--dry-run"], /check does not take --dry-run/);
   bad(["check", "--git-bash"], /check does not take --git-bash/);
-  bad(["explain"], /explain needs a finding id \(no-shell-tool, /);
+  bad(["explain"], /explain needs a finding id or --list \(no-shell-tool, /);
   bad(["explain", "a", "b"], /explain takes one finding id, not "a b"/);
+  bad(["explain", "a", "--list"], /explain takes --list or one finding id, not both/);
+  bad(["explain", "a", "b", "--list"], /explain takes --list or one finding id, not both/);
   bad(["explain", "x", "--live"], /explain does not take --live/);
+  bad(["check", "--list"], /check does not take --list/);
+  bad(["fix", "--git-bash", "--list"], /fix does not take --list/);
+  bad(["undo", "--list"], /undo does not take --list/);
   bad(["fix"], /fix needs what to fix: --git-bash/);
   bad(["fix", "--git-bash", "--markdown"], /fix does not take --markdown/);
   bad(["fix", "--path", "x"], /fix needs what to fix: --git-bash/);
@@ -156,12 +164,18 @@ test("--project: a relative folder is taken from the working folder; the default
   assert.equal(c.project, "D:\\other");
 });
 
-test("explain: a page, the same as JSON, an id that is not one (exit 1, with the near ids), a missing id (exit 2)", async () => {
+test("explain: a page, the list as text and JSON, an id that is not one (exit 1, with the near ids), a missing id (exit 2)", async () => {
   const t = await run(["explain", "wsl-no-distro"]);
   assert.equal(t.code, 0);
   assert.match(t.out, /^wsl-no-distro {3}WSL has only the distributions of other tools\n/);
   const j = (await run(["explain", "wsl-no-distro", "--json"])).json();
   assert.equal(j.id, "wsl-no-distro");
+  const list = await run(["explain", "--list"]);
+  assert.equal(list.code, 0);
+  assert.match(list.out, /^no-shell-tool +Claude Code will not start: no Git Bash and the PowerShell tool is off\n/);
+  const listJson = (await run(["explain", "--list", "--json"])).json();
+  assert.equal(listJson.ok, true);
+  assert.deepEqual(listJson.findings.map((p) => p.id), IDS);
   const u = await run(["explain", "git-bash"]);
   assert.equal(u.code, 1);
   assert.match(u.err, /no finding called "git-bash"\. Did you mean git-bash-not-found, git-bash-path-ignored/);
@@ -170,7 +184,10 @@ test("explain: a page, the same as JSON, an id that is not one (exit 1, with the
   assert.equal(uj.ids.length >= 27, true);
   const m = await run(["explain"]);
   assert.equal(m.code, 2);
-  assert.match(m.err, /explain needs a finding id/);
+  assert.match(m.err, /explain needs a finding id or --list/);
+  const both = await run(["explain", "no-shell-tool", "--list", "--json"]);
+  assert.equal(both.code, 2);
+  assert.deepEqual(both.json(), { ok: false, error: "explain takes --list or one finding id, not both" });
 });
 
 test("fix and undo through the command line: the report, the exit codes, the JSON, and the refusal off Windows", async () => {

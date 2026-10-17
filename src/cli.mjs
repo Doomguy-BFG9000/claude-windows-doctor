@@ -8,8 +8,8 @@ import { collectWindows, collectWsl, kindOf, notApplicable } from "./check.mjs";
 import { versionOf } from "./binaries.mjs";
 import { proveShell } from "./live.mjs";
 import { runFix, runUndo } from "./fix.mjs";
-import { IDS, nearIds, pageFor } from "./explain.mjs";
-import { checkJson, checkMarkdown, checkText, explainJson, explainText, fixJson, fixText } from "./report.mjs";
+import { IDS, listPages, nearIds, pageFor } from "./explain.mjs";
+import { checkJson, checkMarkdown, checkText, explainJson, explainListJson, explainListText, explainText, fixJson, fixText } from "./report.mjs";
 
 export const HELP = `Usage: claude-windows-doctor <command> [options]
 
@@ -26,7 +26,7 @@ Read (they change nothing):
            the first claude on PATH or --claude. --markdown is the short report the
            /windows-doctor:check skill hands to Claude (at most 12 findings); it always exits 0,
            because Claude Code drops a skill whose command fails
-  explain  <finding-id>
+  explain  [--list] <finding-id>
            what a finding means, what Claude Code does in that case (each line marked verified,
            documented or not verified), the fix, and the issue threads
 
@@ -57,19 +57,19 @@ Anthropic or anyone else.
 
 const COMMANDS = {
   check: { options: ["project", "json", "markdown", "live", "claude"], positional: 0 },
-  explain: { options: ["json"], positional: 1, required: true },
+  explain: { options: ["json", "list"], positional: 1 },
   fix: { options: ["project", "json", "dryRun", "gitBash", "path"], positional: 0 },
   undo: { options: ["json", "dryRun"], positional: 0 },
 };
 
-const FLAGS = { "--json": "json", "--markdown": "markdown", "--live": "live", "--dry-run": "dryRun", "--git-bash": "gitBash", "-h": "help", "--help": "help", "-v": "version", "--version": "version" };
+const FLAGS = { "--json": "json", "--markdown": "markdown", "--live": "live", "--list": "list", "--dry-run": "dryRun", "--git-bash": "gitBash", "-h": "help", "--help": "help", "-v": "version", "--version": "version" };
 const VALUES = { "--project": "project", "--claude": "claude", "--path": "path" };
 
 class UsageError extends Error {}
 
-/** Reads the argument list. Returns { command, id, project, claude, path, json, markdown, live, dryRun, gitBash, help, version, given } or throws a UsageError. */
+/** Reads the argument list. Returns { command, id, project, claude, path, json, markdown, live, list, dryRun, gitBash, help, version, given } or throws a UsageError. */
 export function parseArgs(argv) {
-  const o = { command: null, id: null, project: undefined, claude: undefined, path: undefined, json: false, markdown: false, live: false, dryRun: false, gitBash: false, help: false, version: false, given: new Set() };
+  const o = { command: null, id: null, project: undefined, claude: undefined, path: undefined, json: false, markdown: false, live: false, list: false, dryRun: false, gitBash: false, help: false, version: false, given: new Set() };
   const positional = [];
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -95,8 +95,9 @@ export function parseArgs(argv) {
   if (!spec) throw new UsageError(`unknown command "${o.command}"`);
   for (const key of o.given) if (key !== "help" && key !== "version" && !spec.options.includes(key)) throw new UsageError(`${o.command} does not take --${key.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)}`);
   const rest = positional.slice(1);
+  if (o.command === "explain" && o.list && rest.length) throw new UsageError("explain takes --list or one finding id, not both");
   if (rest.length > spec.positional) throw new UsageError(`${o.command} takes ${spec.positional === 0 ? "no name" : "one finding id"}, not "${rest.join(" ")}"`);
-  if (spec.required && rest.length === 0) throw new UsageError(`${o.command} needs a finding id (${IDS.join(", ")})`);
+  if (o.command === "explain" && !o.list && rest.length === 0) throw new UsageError(`explain needs a finding id or --list (${IDS.join(", ")})`);
   o.id = rest[0] || null;
   if (o.command === "check" && o.claude !== undefined && !o.live) throw new UsageError("--claude is for --live: it names the claude to run");
   if (o.command === "fix" && !o.gitBash) throw new UsageError("fix needs what to fix: --git-bash");
@@ -139,6 +140,11 @@ export async function main(argv, io = {}) {
     const project = o.project === undefined ? undefined : (path[sys.platform === "win32" ? "win32" : "posix"].isAbsolute(o.project) ? o.project : path[sys.platform === "win32" ? "win32" : "posix"].join(sys.cwd, o.project));
 
     if (o.command === "explain") {
+      if (o.list) {
+        const pages = listPages();
+        emit(explainListJson(pages), explainListText(pages));
+        return 0;
+      }
       const page = pageFor(o.id);
       if (!page) {
         const near = nearIds(o.id);

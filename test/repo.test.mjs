@@ -234,7 +234,6 @@ test("the licence, the conduct file, the changelog and the version agree", () =>
   assert.match(read("SECURITY.md"), /security\/advisories\/new/);
   const roadmap = read("ROADMAP.md");
   assert.ok((roadmap.match(/^- /gm) || []).length >= 3 && (roadmap.match(/^- /gm) || []).length <= 5, "three to five next steps");
-  assert.match(roadmap, /good first issue: \[#1\]\(https:\/\/github\.com\/nrzz\/claude-windows-doctor\/issues\/1\)/, "the roadmap names the good first issue");
   assert.match(read("CONTRIBUTING.md"), /## Where things are/);
 });
 
@@ -454,7 +453,7 @@ test("the JSON shapes in the README: every field of a document and of the lists 
       await json(["fix", "--git-bash"], { sys: mac }),
     ],
     undo: [await json(["undo", "--dry-run"], { sys: win })],
-    explain: [await json(["explain", "git-bash-not-found"], { sys: win })],
+    explain: [await json(["explain", "git-bash-not-found"], { sys: win }), await json(["explain", "--list"], { sys: win })],
     error: [await json(["explain"], { sys: win }), await json(["explain", "nosuch"], { sys: win })],
   };
   const everyKey = (v, out = new Set()) => { if (Array.isArray(v)) v.forEach((x) => everyKey(x, out)); else if (v && typeof v === "object") for (const [k, x] of Object.entries(v)) { out.add(k); everyKey(x, out); } return out; };

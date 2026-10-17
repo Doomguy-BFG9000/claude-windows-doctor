@@ -235,6 +235,11 @@ export const PAGES = [
 export const IDS = PAGES.map((p) => p.id);
 const MARK = { V: "verified", D: "documented", N: "not verified" };
 
+/** Every page id and title, in page order. */
+export function listPages() {
+  return PAGES.map(({ id, title }) => ({ id, title }));
+}
+
 /** A page by id, with each line of `does` split into its mark and text, or null. */
 export function pageFor(id) {
   const key = String(id).trim().toLowerCase();

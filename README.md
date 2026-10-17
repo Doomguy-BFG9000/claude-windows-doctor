@@ -71,7 +71,7 @@ Read (they change nothing):
            the first claude on PATH or --claude. --markdown is the short report the
            /windows-doctor:check skill hands to Claude (at most 12 findings); it always exits 0,
            because Claude Code drops a skill whose command fails
-  explain  <finding-id>
+  explain  [--list] <finding-id>
            what a finding means, what Claude Code does in that case (each line marked verified,
            documented or not verified), the fix, and the issue threads
 
@@ -313,7 +313,7 @@ No record of a fix was found (looked at C:\Users\me\.claude\windows-doctor\recor
 
 ### `explain`
 
-`explain <finding-id>` prints the page of a finding (the id may be written in any case). Each line under "What Claude Code does" is marked: *verified* (seen in a real run, of the binary or of the Windows program the line names), *documented* (from Claude Code's, Windows' or git's documentation) or *not verified*. Exit 1 for an id that is not one, with the nearest ids.
+`explain <finding-id>` prints the page of a finding (the id may be written in any case). `explain --list` prints every finding id with its title; add `--json` for a document with the same entries. Each line under "What Claude Code does" is marked: *verified* (seen in a real run, of the binary or of the Windows program the line names), *documented* (from Claude Code's, Windows' or git's documentation) or *not verified*. Exit 1 for an id that is not one, with the nearest ids.
 
 ```text
 $ claude-windows-doctor explain git-bash-not-found
@@ -362,6 +362,7 @@ check      { ok, applicable, platform, kind, project, system { os, release, arch
 fix        { ok, refused, reason, dryRun, action, name, key, layer, value, previous { value, type }, via, record, notes [] }    // previous is null when nothing was there; action is set or nothing, and null when refused
 undo       { ok, refused, reason, dryRun, action, name, key, layer, value, previous { value?, type? }, via, record, notes [] }    // action is restore, remove, forget or nothing
 explain    { ok, id, title, means, does [ { source, text } ], fix [], issues [ { number, title, url } ] }
+explain    { ok, findings [ { id, title } ] }    // explain --list
 error      { ok, error }    // a usage error with --json: exit 2
 error      { ok, refused, ids, near }    // explain with an id that is not one: exit 1
 ```

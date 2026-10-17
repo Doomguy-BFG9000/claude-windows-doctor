@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { ROOT } from "./helpers.mjs";
-import { IDS, PAGES, nearIds, pageFor } from "../src/explain.mjs";
+import { IDS, PAGES, listPages, nearIds, pageFor } from "../src/explain.mjs";
 import { explainJson, explainText } from "../src/report.mjs";
 
 const sources = () => fs.readdirSync(path.join(ROOT, "src")).filter((n) => n.endsWith(".mjs")).filter((n) => n !== "explain.mjs").map((n) => fs.readFileSync(path.join(ROOT, "src", n), "utf8"));
@@ -15,6 +15,10 @@ test("a page for every id that the findings can emit, and no page for an id that
   assert.deepEqual([...IDS].sort(), emitted());
   assert.equal(new Set(IDS).size, IDS.length);
   assert.ok(IDS.length >= 27, `${IDS.length} pages`);
+});
+
+test("listPages has every id and title in page order, and no page detail", () => {
+  assert.deepEqual(listPages(), PAGES.map(({ id, title }) => ({ id, title })));
 });
 
 test("every page has a title, what it means, lines of what Claude Code does that each say where they come from, a fix, and well-formed issue links", () => {
